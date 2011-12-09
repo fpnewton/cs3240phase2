@@ -22,10 +22,9 @@ public class GrammarScanner
 	public GrammarScanner()
 	{
 		GrammarLines = new ArrayList<String>();
-		// TODO
 	}
-	
-	
+
+
 	public Grammar getGrammar()
 	{
 		return this.Grammar;
@@ -34,16 +33,16 @@ public class GrammarScanner
 
 	public boolean ReadGrammarFile(String path)
 	{
-		boolean			hadError	= false;
-		FileReader		inputStream	= null;
+		boolean hadError = false;
+		FileReader inputStream = null;
 
 		try
 		{
 			// Open the file for reading
 			inputStream = new FileReader(path);
 
-			int				ch;
-			StringBuilder	line = new StringBuilder("");
+			int ch;
+			StringBuilder line = new StringBuilder("");
 
 			while ((ch = inputStream.read()) != -1)
 			{
@@ -52,7 +51,7 @@ public class GrammarScanner
 					if (line.length() > 0)
 					{
 						this.GrammarLines.add(line.toString());
-						
+
 						line.delete(0, line.length());
 					}
 				}
@@ -61,19 +60,19 @@ public class GrammarScanner
 					line.append((char) ch);
 				}
 			}
-			
-			//this.Buffer = new TokenBuffer(file.toString(), "\r\n", "%%");
+
+			// this.Buffer = new TokenBuffer(file.toString(), "\r\n", "%%");
 		}
 		catch (FileNotFoundException e)
 		{
 			System.out.println("Error: Could not open file " + path + " for reading.");
-			
+
 			hadError = true;
 		}
 		catch (IOException e)
 		{
 			System.out.println(e.getStackTrace());
-			
+
 			hadError = true;
 		}
 		finally
@@ -87,12 +86,12 @@ public class GrammarScanner
 				catch (IOException e)
 				{
 					System.out.println(e.getStackTrace());
-					
+
 					hadError = true;
 				}
 			}
 		}
-		
+
 		if (hadError)
 		{
 			return false;
@@ -100,12 +99,18 @@ public class GrammarScanner
 
 		return true;
 	}
-	
-	
+
+
 	public boolean parseGrammar()
 	{
-		MutableGrammar	mutGrammar		= new MutableGrammar();	// Mutable to build the correct grammar object before storing it into a non-mutable grammar object
-		
+		MutableGrammar mutGrammar = new MutableGrammar(); // Mutable to build
+															// the correct
+															// grammar object
+															// before storing it
+															// into a
+															// non-mutable
+															// grammar object
+
 		// Iterate through each line in the grammar definition file
 		for (String line : this.GrammarLines)
 		{
@@ -114,11 +119,11 @@ public class GrammarScanner
 			{
 				continue;
 			}
-			
+
 			// String builders for the each identifier and its definition
 			StringBuilder identifier = new StringBuilder("");
 			StringBuilder definition = new StringBuilder("");
-			
+
 			// Iterate through each character in the line
 			for (int i = 0; i < line.length(); i++)
 			{
@@ -136,7 +141,7 @@ public class GrammarScanner
 						{
 							i++;
 						}
-						
+
 						definition.append(line.charAt(i));
 					}
 				}
@@ -147,38 +152,37 @@ public class GrammarScanner
 					{
 						i++;
 					}
-					
+
 					// Build the identifier definition
 					definition.append(line.charAt(i));
 				}
 			}
-			
+
 			// Make sure that the identifier is valid
 			if (identifier.charAt(0) != '$')
 			{
 				System.out.println("Error: Invalid identifier '" + identifier + "'");
-				
+
 				return false;
 			}
 
-			
 			if (definition.charAt(0) == '[')
 			{
 				String strs[] = expandCharacterClassDefinition(definition.toString());
-				
+
 				String pattern;
-				
+
 				if (strs.length == 3)
 				{
 					String exstr = mutGrammar.getCharacterClassRegex(strs[2]);
-					
+
 					pattern = "[" + exclude(exstr, strs[0].substring(1)) + "]";
 				}
 				else
 				{
 					pattern = strs[0];
 				}
-				
+
 				mutGrammar.addCharacterClass(identifier.toString(), pattern);
 			}
 			else
@@ -186,73 +190,72 @@ public class GrammarScanner
 				mutGrammar.addIdentifier(identifier.toString(), definition.toString());
 			}
 		}
-		
+
 		this.Grammar = new Grammar(mutGrammar);
-		
+
 		return true;
 	}
-	
-	
+
+
 	private String exclude(String pattern, String exclude)
 	{
 		StringBuilder result = new StringBuilder("");
-		
+
 		for (int i = 1; i < pattern.length() - 1; i++)
 		{
 			boolean didFind = false;
-			
+
 			for (int j = 1; j < exclude.length() - 1; j++)
 			{
 				char p = pattern.charAt(i) != '\\' ? pattern.charAt(i) : pattern.charAt(i + 1);
 				char e = exclude.charAt(j) != '\\' ? exclude.charAt(j) : exclude.charAt(j + 1);
-				
+
 				if (p == e)
 				{
 					didFind = true;
-					
+
 					break;
 				}
 			}
-			
+
 			if (!didFind)
 			{
 				result.append(pattern.charAt(i) != '\\' ? pattern.charAt(i) : "\\" + pattern.charAt(i + 1));
 			}
 		}
-		
+
 		return result.toString();
 	}
-	
-	
+
+
 	private String[] expandCharacterClassDefinition(String characterClass)
 	{
 		ArrayList<String> tokens = new ArrayList<String>();
-		
+
 		String tk[] = split(characterClass, ' ');
-		
+
 		for (String s : tk)
 		{
 			if (s.charAt(0) != '[')
 			{
 				tokens.add(s);
-				
+
 				continue;
 			}
-			
-			
+
 			StringBuilder tmp = new StringBuilder("");
-			
+
 			for (int i = 0; i < s.length() - 1; i++)
 			{
 				if (s.charAt(i + 1) == '-' && s.charAt(i) != '\\')
-				{						
+				{
 					for (char c = s.charAt(i); c <= (s.charAt(i + 2) != '\\' ? s.charAt(i + 2) : s.charAt(i + 3)); c++)
 					{
 						tmp.append(c);
 					}
-					
+
 					i += 2;
-					
+
 					if (i >= s.length())
 					{
 						break;
@@ -263,22 +266,22 @@ public class GrammarScanner
 					tmp.append(s.charAt(i));
 				}
 			}
-			
+
 			tmp.append(']');
 			tokens.add(tmp.toString());
 		}
-		
+
 		return tokens.toArray(new String[0]);
 	}
-		
-		
+
+
 	private boolean matchCharacter(char c, String pattern)
 	{
 		if (pattern.length() == 0)
 		{
 			return false;
 		}
-		
+
 		for (char ch : pattern.toCharArray())
 		{
 			if (c == ch)
@@ -286,40 +289,40 @@ public class GrammarScanner
 				return true;
 			}
 		}
-		
+
 		return false;
 	}
-	
-	
+
+
 	public String[] split(String input, char token)
 	{
 		ArrayList<String> tokens = new ArrayList<String>();
 		StringBuilder tmp = new StringBuilder("");
-		
+
 		for (int i = 0; i < input.length(); i++)
 		{
 			if (input.charAt(i) == token)
 			{
 				tokens.add(tmp.toString());
 				tmp.delete(0, tmp.length());
-				
+
 				continue;
 			}
-			
+
 			tmp.append(input.charAt(i));
 		}
-		
+
 		tokens.add(tmp.toString());
-		
+
 		return tokens.toArray(new String[0]);
 	}
-	
-	
+
+
 	public String[] tokenize(String input)
 	{
 		ArrayList<String> tokens = new ArrayList<String>();
 		StringBuilder token = new StringBuilder();
-		
+
 		for (int i = 0; i < input.length(); i++)
 		{
 			if (input.charAt(i) == '\\' && i < (input.length() - 1))
@@ -334,16 +337,16 @@ public class GrammarScanner
 			{
 				continue;
 			}
-			
+
 			if (matchCharacter(input.charAt(i), "\\*+|[]().'\""))
 			{
 				if (token.length() > 0)
 				{
 					tokens.add(token.toString());
 				}
-				
+
 				tokens.add(input.charAt(i) + "");
-				
+
 				token.delete(0, token.length());
 			}
 			else
@@ -351,7 +354,7 @@ public class GrammarScanner
 				token.append(input.charAt(i));
 			}
 		}
-		
+
 		return tokens.toArray(new String[0]);
 	}
 }
