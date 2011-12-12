@@ -93,5 +93,6 @@ public class Main
 		
 		
 		RecursiveDescentParser p = new RecursiveDescentParser();
+		p.run();
 	}
 }
