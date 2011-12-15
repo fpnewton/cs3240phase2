@@ -57,6 +57,7 @@ public class ASTRunner
 	
 	private void pound()
 	{
-		
+		Token ID = Tokens.remove(0);
+		int lengthOfList = Variables.get(ID.getData()).length();		
 	}
 }
