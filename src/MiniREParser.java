@@ -1,4 +1,3 @@
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
@@ -17,6 +16,13 @@ public class MiniREParser
 	}
 	
 	
+	public void run()
+	{
+		RecursiveDescentParser p = new RecursiveDescentParser(Tokens.toArray(new Token[0]));
+		p.run();
+	}
+	
+	
 	public boolean parseProgram(String filepath)
 	{
 		try
@@ -26,44 +32,115 @@ public class MiniREParser
 			StringBuilder tmp = new StringBuilder();
 			
 			char character = '\0';
+			int c;
 			
-			while ((character = (char) inputStream.read()) != -1)
+			while ((c = inputStream.read()) != -1)
 			{
+				character = (char) c;
+				
+				if (character == '\r')
+				{
+					continue;
+				}
+				
 				if (character == '%')
 				{
-					while ((character = (char) inputStream.read()) != '\n');
+					while (character != '\r' || character != '\n')
+					{
+						character = (char) inputStream.read();
+					}
 				}
 				else if (character == '\"')
 				{
-					Tokens.add(new Token(TokenType.ASCII_STR, parseString(inputStream)));
+					Token previousToken = Tokens.get(Tokens.size() - 1);
+					
+					if (previousToken.getTokenType() == TokenType.IN)
+					{
+						Tokens.add(new Token(TokenType.SOURCE_FILE, parseString(inputStream)));
+					}
+					else if (previousToken.getTokenType() == TokenType.OUTPUT_FILE)
+					{
+						Tokens.add(new Token(TokenType.DESTINATION_FILE, parseString(inputStream)));
+					}
+					else
+					{
+						Tokens.add(new Token(TokenType.ASCII_STR, parseString(inputStream)));
+					}
 				}
 				else if (character == '\'')
 				{
 					Tokens.add(new Token(TokenType.REGEX, parseRegularExpression(inputStream)));
 				}
-				else if (character == '=')
+				else if (character == '(' || character == ')' || character == ';' || character == '=' || character == '+' || character == '-' || character == '*' || character == '/' || character == '#')
 				{
+					if (tmp.length() > 0)
+					{
+						if (!addToken(tmp.toString()))
+						{
+							Tokens.add(new Token(TokenType.ID, tmp.toString()));
+							
+							if (!Variables.contains(tmp.toString()))
+							{
+								Variables.add(tmp.toString());
+							}
+							
+							tmp.delete(0, tmp.length());
+						}
+					}
+					
 					addToken("" + character);
 				}
-				else if (character == '+')
+				else if (character == '>')
 				{
-					addToken("" + character);
+					character = (char) inputStream.read();
+					
+					if (character == '!')
+					{
+						addToken(">!");
+					}
+					else
+					{
+						tmp.append('>');
+						tmp.append(character);
+					}
 				}
-				else if (character == '-')
+				else if (character == ' ' || character == '\r' || character == '\n')
 				{
-					addToken("" + character);
+					if (tmp.length() == 0)
+					{
+						continue;
+					}
+					
+					if (!addToken(tmp.toString()))
+					{
+						Tokens.add(new Token(TokenType.ID, tmp.toString()));
+						
+						if (!Variables.contains(tmp.toString()))
+						{
+							Variables.add(tmp.toString());
+						}
+					}
+					
+					tmp.delete(0, tmp.length());
 				}
-				else if (character == '*')
+				else
 				{
-					addToken("" + character);
+					tmp.append(character);
 				}
-				else if (character == '/')
+			}
+			
+			if (tmp.length() > 0)
+			{
+				if (!addToken(tmp.toString()))
 				{
-					addToken("" + character);
-				}
-				else if (character == '#')
-				{
-					addToken("" + character);
+					Tokens.add(new Token(TokenType.ID, tmp.toString()));
+					
+					if (!Variables.contains(tmp.toString()))
+					{
+						Variables.add(tmp.toString());
+					}
+					
+					tmp.delete(0, tmp.length());
 				}
 			}
 			
@@ -176,7 +253,7 @@ public class MiniREParser
 
 			return true;
 		}
-		else if (token.compareToIgnoreCase("INTERS") == 0)
+		else if (token.compareToIgnoreCase("INTERSEC") == 0)
 		{
 			Tokens.add(new Token(TokenType.INTERS, null));
 
@@ -192,6 +269,12 @@ public class MiniREParser
 		{
 			Tokens.add(new Token(TokenType.PRINT, null));
 
+			return true;
+		}
+		else if (token.compareToIgnoreCase("FIND") == 0)
+		{
+			Tokens.add(new Token(TokenType.FIND, null));
+			
 			return true;
 		}
 		else if (token.compareToIgnoreCase("") == 0)
@@ -274,5 +357,17 @@ public class MiniREParser
 		}
 		
 		return false;
+	}
+	
+	
+	public Token[] getTokens()
+	{
+		return Tokens.toArray(new Token[0]);
+	}
+	
+	
+	public String[] getVariables()
+	{
+		return Variables.toArray(new String[0]);
 	}
 }

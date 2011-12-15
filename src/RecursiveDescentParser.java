@@ -3,17 +3,28 @@ import java.util.ArrayList;
 
 public class RecursiveDescentParser
 {
-	ArrayList<Token>	tokens	= new ArrayList<Token>();
+	ArrayList<Token>	Tokens;
+	
+	
+	public RecursiveDescentParser(Token tokens[])
+	{
+		Tokens = new ArrayList<Token>();
+		
+		for (Token token : tokens)
+		{
+			Tokens.add(token);
+		}
+	}
 
 
 	void run()
 	{
-		tokens.add(new Token(TokenType.BEGIN, null));
-		tokens.add(new Token(TokenType.ID, "a"));
-		tokens.add(new Token(TokenType.ASSIGN, "="));
-		tokens.add(new Token(TokenType.INTNUM, "2"));
-		tokens.add(new Token(TokenType.SEMICOLON, ";"));
-		tokens.add(new Token(TokenType.END, null));
+		Tokens.add(new Token(TokenType.BEGIN, null));
+		Tokens.add(new Token(TokenType.ID, "a"));
+		Tokens.add(new Token(TokenType.ASSIGN, "="));
+		Tokens.add(new Token(TokenType.INTNUM, "2"));
+		Tokens.add(new Token(TokenType.SEMICOLON, ";"));
+		Tokens.add(new Token(TokenType.END, null));
 
 		miniREProgram();
 	}
@@ -21,23 +32,23 @@ public class RecursiveDescentParser
 
 	Token peekToken()
 	{
-		if (tokens.size() == 0)
+		if (Tokens.size() == 0)
 		{
 			return new Token(TokenType.NULL, null);
 		}
 
-		return tokens.get(0);
+		return Tokens.get(0);
 	}
 
 
 	Token popToken()
 	{
-		if (tokens.size() == 0)
+		if (Tokens.size() == 0)
 		{
 			return new Token(TokenType.NULL, null);
 		}
 
-		return tokens.remove(0);
+		return Tokens.remove(0);
 	}
 
 

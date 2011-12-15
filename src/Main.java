@@ -91,8 +91,24 @@ public class Main
 		NFAParser nfaParser = new NFAParser(G);
 		nfaParser.generateIdentifierNFAs();
 		
+		MiniREParser re = new MiniREParser();
 		
-		RecursiveDescentParser p = new RecursiveDescentParser();
-		p.run();
+		if (re.parseProgram(System.getProperty("java.class.path") + System.getProperty("file.separator") + "minire_test_script.txt"))
+		{
+			System.out.println("Tokens:");
+			for (Token tk : re.getTokens())
+			{
+				System.out.println(tk);
+			}
+			
+			System.out.println("Variables:");
+			for (String str : re.getVariables())
+			{
+				System.out.println(str);
+			}
+		}
+		
+		RecursiveDescentParser p = new RecursiveDescentParser(re.getTokens());
+		//p.run();
 	}
 }

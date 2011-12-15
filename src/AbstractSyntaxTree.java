@@ -32,8 +32,8 @@ public class AbstractSyntaxTree
 	{
 		return Children.toArray(new AbstractSyntaxTree[0]);
 	}
-	
-	
+
+
 	public NodeClass getNodeClass()
 	{
 		return Class;
@@ -50,12 +50,12 @@ public class AbstractSyntaxTree
 	{
 		return Children.get(index);
 	}
-	
-	
+
+
 	public int getSize()
 	{
 		int size = 0;
-		
+
 		if (Class == NodeClass.EMPTY)
 		{
 			return 0;
@@ -64,20 +64,20 @@ public class AbstractSyntaxTree
 		{
 			return 1;
 		}
-		
+
 		for (AbstractSyntaxTree child : Children)
 		{
 			size += child.getSize();
 		}
-		
+
 		return size;
 	}
-	
-	
+
+
 	public String toString()
 	{
 		String output = "Node: " + Class + "\n";
-		
+
 		if (Token != null)
 		{
 			output += "Token: " + Token + "\n";
@@ -92,7 +92,7 @@ public class AbstractSyntaxTree
 				}
 			}
 		}
-		
+
 		return output;
 	}
 }
