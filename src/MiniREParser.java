@@ -16,13 +16,6 @@ public class MiniREParser
 	}
 	
 	
-	public void run()
-	{
-		RecursiveDescentParser p = new RecursiveDescentParser(Tokens.toArray(new Token[0]));
-		p.run();
-	}
-	
-	
 	public boolean parseProgram(String filepath)
 	{
 		try
@@ -52,20 +45,7 @@ public class MiniREParser
 				}
 				else if (character == '\"')
 				{
-					Token previousToken = Tokens.get(Tokens.size() - 1);
-					
-					if (previousToken.getTokenType() == TokenType.IN)
-					{
-						Tokens.add(new Token(TokenType.SOURCE_FILE, parseString(inputStream)));
-					}
-					else if (previousToken.getTokenType() == TokenType.OUTPUT_FILE)
-					{
-						Tokens.add(new Token(TokenType.DESTINATION_FILE, parseString(inputStream)));
-					}
-					else
-					{
-						Tokens.add(new Token(TokenType.ASCII_STR, parseString(inputStream)));
-					}
+					Tokens.add(new Token(TokenType.ASCII_STR, parseString(inputStream)));
 				}
 				else if (character == '\'')
 				{

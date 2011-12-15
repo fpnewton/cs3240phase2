@@ -25,6 +25,6 @@ public class Token
 
 	public String toString()
 	{
-		return Type.toString() + " : " + Data;
+		return "(" + this.Type + (this.Data != null ? "=\'" + this.Data + "\'" : "") + ")";
 	}
 }

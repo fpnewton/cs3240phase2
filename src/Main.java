@@ -95,20 +95,11 @@ public class Main
 		
 		if (re.parseProgram(System.getProperty("java.class.path") + System.getProperty("file.separator") + "minire_test_script.txt"))
 		{
-			System.out.println("Tokens:");
-			for (Token tk : re.getTokens())
-			{
-				System.out.println(tk);
-			}
+			RecursiveDescentParser p = new RecursiveDescentParser(re.getTokens());
 			
-			System.out.println("Variables:");
-			for (String str : re.getVariables())
-			{
-				System.out.println(str);
-			}
+			AbstractSyntaxTree t = p.miniREProgram();
+			
+			System.out.println(t.toString());
 		}
-		
-		RecursiveDescentParser p = new RecursiveDescentParser(re.getTokens());
-		//p.run();
 	}
 }

@@ -5,20 +5,18 @@ public class AbstractSyntaxTree
 {
 	private Token							Token;
 	private ArrayList<AbstractSyntaxTree>	Children;
-	private NodeClass						Class;
 
 
-	public AbstractSyntaxTree(NodeClass nodeClass)
+	public AbstractSyntaxTree()
 	{
-		this(null, nodeClass);
+		this(null);
 	}
 
 
-	public AbstractSyntaxTree(Token token, NodeClass nodeClass)
+	public AbstractSyntaxTree(Token token)
 	{
-		Token = token;
-		Children = new ArrayList<AbstractSyntaxTree>();
-		Class = nodeClass;
+		Children	= new ArrayList<AbstractSyntaxTree>();
+		Token		= token;
 	}
 
 
@@ -31,12 +29,6 @@ public class AbstractSyntaxTree
 	public AbstractSyntaxTree[] getChildren()
 	{
 		return Children.toArray(new AbstractSyntaxTree[0]);
-	}
-
-
-	public NodeClass getNodeClass()
-	{
-		return Class;
 	}
 
 
@@ -56,7 +48,7 @@ public class AbstractSyntaxTree
 	{
 		int size = 0;
 
-		if (Class == NodeClass.EMPTY)
+		if (Token.getTokenType() == TokenType.EMPTY)
 		{
 			return 0;
 		}
@@ -76,21 +68,32 @@ public class AbstractSyntaxTree
 
 	public String toString()
 	{
-		String output = "Node: " + Class + "\n";
-
+		return toString(0);
+	}
+	
+	
+	private String toString(int depth)
+	{
+String output = "";
+		
 		if (Token != null)
 		{
 			output += "Token: " + Token + "\n";
 		}
-		else
+		
+		if (Children.size() > 0)
 		{
-			if (Children.size() > 0)
+			for (AbstractSyntaxTree child : Children)
 			{
-				for (AbstractSyntaxTree child : Children)
+				for (int i = 0; i < depth; i++)
 				{
-					output += "\t" + child.toString();
+					output += "  ";
 				}
+				
+				output += child.toString(depth++);
 			}
+			
+			depth--;
 		}
 
 		return output;
