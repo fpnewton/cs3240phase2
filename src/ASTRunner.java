@@ -1,16 +1,22 @@
+import java.util.ArrayList;
 import java.util.HashMap;
 
 
 public class ASTRunner
 {
-	private AbstractSyntaxTree		AST;
+	private ArrayList<Token>		Tokens;
 	private HashMap<String, String>	Variables;
 
 
-	public ASTRunner(AbstractSyntaxTree ast, String[] variableNames)
+	public ASTRunner(Token tokens[], String[] variableNames)
 	{
-		AST			= ast;
+		Tokens		= new ArrayList<Token>();
 		Variables	= new HashMap<String, String>();
+		
+		for (Token tk : tokens)
+		{
+			Tokens.add(tk);
+		}
 
 		for (String var : variableNames)
 		{
@@ -21,31 +27,35 @@ public class ASTRunner
 	
 	public void run()
 	{
-		run(AST, 0);
+		while (Tokens.size() > 0)
+		{
+			Token token = Tokens.remove(0);
+			
+			if (token.getTokenType() == TokenType.BEGIN)
+			{
+				continue;
+			}
+			else if (token.getTokenType() == TokenType.ID)
+			{
+				statement();
+			}
+		}
 	}
 	
 	
-	private void run(AbstractSyntaxTree tree, int depth)
+	private void statement()
 	{
-		if (tree.getChildren().length == 0)
+		Token id = Tokens.remove(0);
+		Tokens.remove(0);
+		
+		if (Tokens.get(0).getTokenType() == TokenType.POUND)
 		{
-			for (int i = 0; i < depth; i++)
-			{
-				System.out.print("  ");
-			}
-			System.out.println(tree.getToken());
-		}
-		else
-		{
-			for (int i = 0; i < tree.getChildren().length; i++)
-			{
-				run(tree.getChild(i), depth + 1);
-			}
+			pound();
 		}
 	}
 	
 	
-	private void print(AbstractSyntaxTree exp)
+	private void pound()
 	{
 		
 	}

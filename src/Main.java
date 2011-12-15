@@ -98,9 +98,13 @@ public class Main
 			RecursiveDescentParser p = new RecursiveDescentParser(re.getTokens());
 			
 			AbstractSyntaxTree t = p.miniREProgram();
-			ASTRunner runner = new ASTRunner(t, re.getVariables());
+			for (Token tk : re.getTokens())
+			{
+				System.out.println(tk);
+			}
+			ASTRunner runner = new ASTRunner(re.getTokens(), re.getVariables());
 			
-			runner.run();
+			//runner.run();
 		}
 	}
 }
